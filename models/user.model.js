@@ -13,12 +13,15 @@ const userSchema = new Schema({
     },
     email:{
         type: String,
-        required: true,
     },
     name: String,
     events: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: "Event"
+    }],
+    friendlist:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
     }]
 })
 

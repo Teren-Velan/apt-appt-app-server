@@ -1,7 +1,13 @@
 const router = require("express").Router()
 const Event = require("../models/event.model")
+const User=  require("../models/user.model")
 
-router.post("/add", async (req,res)=>{
+
+/**
+ * @POST
+ * @AddNewEvents
+ */
+router.post("/:username/add", async (req,res)=>{
     try{
         let {event_name, start_date, end_date, participants} = req.body
         if(!event_name || !start_date || !end_date){
@@ -13,7 +19,15 @@ router.post("/add", async (req,res)=>{
             end_date,
             participants
         })
-        newEvent.save()
+        await newEvent.save()
+
+        let currentUser = await User.findOne({username: req.params.username})
+        console.log("Current USer: ", currentUser)
+        console.log("Current USer event: ", currentUser.events)
+        currentUser.events.push(newEvent)
+
+        await currentUser.save()
+
         return res.status(200).json({msg: "Event added!"})
     }catch(err){
         console.log(err)
@@ -21,43 +35,74 @@ router.post("/add", async (req,res)=>{
     }
 })
 
+/**
+ * @get
+ * @Searchbar
+ */
+router.get("/", async(req,res)=>{
+    let {searchField} = req.body
+    let regex = new RegExp(searchField, "i")
+    try {
+    let user = await User.find({username:regex})
+        res.status(200).json({msg: "hiii", user})
+    } catch (error) {
+        res.status(400).json({err: error})
+    }
+})
 
-router.put("/dateblock/:userid/:eventid", async(req,res)=>{
+/**
+ * @PUT
+ * @UpdatingEventBlockedDates
+ */
+router.put("/dateblock/:username/:eventid", async(req,res)=>{
     try {
         //getting the blocked dates user have selected in the front end
         let {dates} = req.body
 
         //finding out who is the User who is blocking their dates
-        let currentUser = await User.findOne(req.params.userid)
+        let currentUser = await User.findOne({username: req.params.username})
 
         //finding the specific Event
-        let currentEvent = await Event.findOne(req.params.eventid)
+        let currentEvent = await Event.findOne({_id: req.params.eventid})
 
-        //finding if the user already blocked the same entry
-        currentEvent.dateblocks.forEach(async(el)=>{
-            if (el.participant == currentUser.username){
-                if(el.blockeddates != dates){
-                    el.blockeddates = dates
+        //adding dateblock if user is the first one
+        if(currentEvent.dateblocks.length<1){
+            await Event.findByIdAndUpdate(req.params.eventid, {$push : {dateblocks: {
+                participant: currentUser.username,
+                blockeddates: dates
+            }}})
+            return res.status(200).json({msg: "Successfully updated the event blocked dates"})
+        }
+        
+        currentEvent.dateblocks.forEach(async (el,index)=>{
+            //overwrite user's previous block dates
+            if(currentUser.username == el.participant){
+                currentEvent.dateblocks.splice(index,1)
                 await currentEvent.save()
-                return res.status(200).json({msg: "Successfully updated the event blocked dates"})
-                }
-                else{
-                    return res.status(400).json({msg:"Already existed"})
-                }
-            }
-            else{
-                let newBlockedData = {
+                await Event.findByIdAndUpdate(req.params.eventid, {$push : {dateblocks: {
                     participant: currentUser.username,
                     blockeddates: dates
+                }}})
+                return res.status(200).json({msg: "Successfully Modified"})
                 }
-                currentEvent.dateblocks.push(newBlockedData)
-            await currentEvent.save()
-            return res.status(200).json({msg: "Successfully updated the event blocked dates"})
+            else{
+                //adding user's block dates
+                await Event.findByIdAndUpdate(req.params.eventid, {$push : {dateblocks: {
+                    participant: currentUser.username,
+                    blockeddates: dates
+                }}})
+                return res.status(200).json({msg: "Successfully updated the event blocked dates"})
             }
-        })
-    } catch (error) {
-        return res.status(400).json({err: err})
+            })
+            }
+            
+
+        catch (error) {
+        console.log(error)
+        return res.status(400).json({err: error})
     }
 })
+
+
 
 module.exports = router
