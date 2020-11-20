@@ -1,23 +1,38 @@
 const mongoose = require("mongoose")
 const {Schema} = mongoose
 
+const blockSchema = new Schema({
+    participant: {
+        type: String
+    },
+    blockeddates: [{
+        type:String
+    }]
+})
 const eventSchema = new Schema({
     event_name:{
         type: String,
         required: true,
     },
     start_date:{
-        type: Date,
+        type: String,
         required: true,
     },
     end_date:{
-        type: Date,
+        type: String,
         required: true,
     },
-    participants:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }
+    host:[{
+        type: String,
+    }],
+    participants:[{
+        type: String
+    }],
+    status:{
+        type: String,
+        default: "pending"
+    },
+    dateblocks: [blockSchema]
 })
 
 const Event = mongoose.model("Event", eventSchema)
