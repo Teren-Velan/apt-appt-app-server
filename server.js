@@ -10,6 +10,8 @@ const cors = require('cors')
 server.use(express.json())
 server.use(cors())
 
+//routes
+server.use("/event",require("./routes/events.routes"))
 
 
 //listening
