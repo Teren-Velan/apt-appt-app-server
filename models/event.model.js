@@ -14,10 +14,19 @@ const eventSchema = new Schema({
         type: Date,
         required: true,
     },
-    participants:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    }
+    host:[{
+        type: String,
+    }],
+    participants:[{
+        type: String
+    }],
+    status:{
+        type: String,
+        default: "pending"
+    },
+    dateblocks: [{
+        type: Date,
+    }]
 })
 
 const Event = mongoose.model("Event", eventSchema)
