@@ -38,6 +38,7 @@ router.get("/:username/event", async(req,res)=>{
 /**
  * @POST
  * @AddingFriend
+ * @/dashboard/:username/adddfriend
  */
 router.post("/:username/addfriend",async(req,res)=>{
     try {
@@ -49,6 +50,7 @@ router.post("/:username/addfriend",async(req,res)=>{
             return res.status(400).json({msg:"friend do not exist"})
         }
         let existed = user.friendlist.indexOf(friend._id)
+        let existed2 = friend.friendlist.indexOf(user._id)
         if(existed == -1){
             user.friendlist.push(friend)
             friend.friendlist.push(user)
@@ -57,10 +59,15 @@ router.post("/:username/addfriend",async(req,res)=>{
             res.status(200).json({msg:"added friend"})
         }
         else{
-            res.status(400).json({msg: "Already friends"})
+            user.friendlist.splice(existed,1)
+            friend.friendlist.splice(existed2,1)
+            await user.save()
+            await friend.save()
+            res.status(200).json({msg: "Already friends"})
         }
 
     } catch (error) {
+        console.log(error)
         return res.status(400).json({err: error})
     }
 })
