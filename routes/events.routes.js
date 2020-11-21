@@ -53,7 +53,7 @@ router.get("/", async(req,res)=>{
     let {searchField} = req.body
     let regex = new RegExp(searchField, "i")
     try {
-    let user = await User.find({username:regex})
+    let user = await User.find({username:regex}).select(["username"])
         res.status(200).json({msg: "hiii", user})
     } catch (error) {
         res.status(400).json({err: error})

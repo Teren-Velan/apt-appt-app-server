@@ -13,7 +13,7 @@ server.use(cors())
 //routes
 server.use("/auth", require("./routes/auth.routes"))
 server.use("/event",require("./routes/events.routes"))
-server.use("/dashboard",require("./routes/dashboard.routes"))
+server.use("/dashboard", require("./routes/dashboard.routes"))
 
 
 //listening
