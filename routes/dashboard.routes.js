@@ -72,5 +72,30 @@ router.post("/:username/addfriend",async(req,res)=>{
     }
 })
 
+/**
+ * @DELETE
+ * @DeletingEvent
+ * @/dashboard/:eventid/delete
+ */
+router.delete("/:eventid/delete", async(req,res)=>{
+    let event = await Event.findOne({_id : req.params.eventid})
+    event.participants.forEach(async (el)=>{
+        try{
+            let user = await User.findOne({username: el})
+            user.events.forEach(async(el,index)=>{
+                if(el == req.params.eventid){
+                    user.events.splice(index,1)
+                    await user.save()
+                    return res.status(200).json({msg: "Event removed"})
+                }
+            })
+        await Event.findByIdAndDelete(req.params.eventid)
+
+        }catch(err){
+            console.log(err)
+        }
+        
+    })
+})
 
 module.exports = router
