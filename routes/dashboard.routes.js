@@ -9,7 +9,7 @@ const User=  require("../models/user.model")
  */
 router.get("/", async(req,res)=>{
     try {
-        let user = await User.findOne(req.user._id)
+        let user = await User.findOne({username : req.user.username})
         return res.status(200).json({msg:"User data" , user})
     } catch (error) {
         return res.status(400).json({err: error})
@@ -33,5 +33,37 @@ router.get("/:username/event", async(req,res)=>{
     return res.status(400).json({err: error})
     }
 })
+
+
+/**
+ * @POST
+ * @AddingFriend
+ */
+router.post("/:username/addfriend",async(req,res)=>{
+    try {
+        let user = await User.findOne({username : req.params.username})
+        let {username} = req.body
+        let friend = await User.findOne({username})
+        
+        if(!friend){
+            return res.status(400).json({msg:"friend do not exist"})
+        }
+        let existed = user.friendlist.indexOf(friend._id)
+        if(existed == -1){
+            user.friendlist.push(friend)
+            friend.friendlist.push(user)
+            await user.save()
+            await friend.save()
+            res.status(200).json({msg:"added friend"})
+        }
+        else{
+            res.status(400).json({msg: "Already friends"})
+        }
+
+    } catch (error) {
+        return res.status(400).json({err: error})
+    }
+})
+
 
 module.exports = router

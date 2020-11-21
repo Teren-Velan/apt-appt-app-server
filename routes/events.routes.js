@@ -7,7 +7,7 @@ const User=  require("../models/user.model")
  * @POST
  * @AddNewEvents
  */
-router.post("/:username/add", async (req,res)=>{
+router.post("/:username/addevent", async (req,res)=>{
     try{
         let {event_name, start_date, end_date, participants} = req.body
         if(!event_name || !start_date || !end_date){
@@ -22,8 +22,18 @@ router.post("/:username/add", async (req,res)=>{
         await newEvent.save()
 
         let currentUser = await User.findOne({username: req.params.username})
-        console.log("Current USer: ", currentUser)
-        console.log("Current USer event: ", currentUser.events)
+
+        //pushing the event to other invited Users
+        participants.forEach(async (el)=>{
+            try{
+                let invitee = await User.findOne({username : el})
+                invitee.events.push(newEvent)
+                await invitee.save()
+            }catch(err){
+                return res.status(400).json({msg: "Username do not exist"})
+            }
+        })
+
         currentUser.events.push(newEvent)
 
         await currentUser.save()
