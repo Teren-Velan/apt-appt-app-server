@@ -7,16 +7,16 @@ const User=  require("../models/user.model")
  * @RetrievingUserProfile
  * @/dashboard
  */
-router.get("/:username", async(req,res)=>{
+router.get("/" , async(req,res)=>{
     try {
-        //select to choose which information you want to pass specifically
-        let user = await User.findOne({username : req.params.username}).select(["username","email","friendlist"])
-        return res.status(200).json({msg:"User data" , user})
+        let user = await User.findOne({username: req.params.username}).populate("friendlist", "username").select(["username","email","friendlist"])
+        res.status(200).json({msg: "Successfully retrieved friendlist", user})
     } catch (error) {
         console.log(error)
-        return res.status(400).json({err: error})
+        res.status(400).json({err: error})
     }
 })
+
 
 /**
  * @GET
@@ -26,8 +26,8 @@ router.get("/:username", async(req,res)=>{
 router.get("/:username/event", async(req,res)=>{
     try{
     let user = await User.findOne({username : req.params.username}).populate({
-        path: "events"
-    })
+        path: "events",
+    }).select(["events"])
     console.log("user populate ", user)
     return res.status(200).json({msg:"Populate event" , user})
     }
