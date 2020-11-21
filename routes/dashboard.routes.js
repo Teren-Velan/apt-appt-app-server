@@ -7,11 +7,13 @@ const User=  require("../models/user.model")
  * @RetrievingUserProfile
  * @/dashboard
  */
-router.get("/", async(req,res)=>{
+router.get("/:username", async(req,res)=>{
     try {
-        let user = await User.findOne({username : req.user.username})
+        //select to choose which information you want to pass specifically
+        let user = await User.findOne({username : req.params.username}).select(["username","email","friendlist"])
         return res.status(200).json({msg:"User data" , user})
     } catch (error) {
+        console.log(error)
         return res.status(400).json({err: error})
     }
 })
@@ -33,8 +35,6 @@ router.get("/:username/event", async(req,res)=>{
     return res.status(400).json({err: error})
     }
 })
-
-
 /**
  * @POST
  * @AddingFriend
