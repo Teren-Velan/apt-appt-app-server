@@ -6,6 +6,7 @@ const User=  require("../models/user.model")
 /**
  * @POST
  * @AddNewEvents
+ * @/event/:username/add
  */
 router.post("/:username/add", async (req,res)=>{
     try{
@@ -32,6 +33,24 @@ router.post("/:username/add", async (req,res)=>{
     }catch(err){
         console.log(err)
         return res.status(400).json({err: err})
+    }
+})
+
+/**
+ * @GET
+ * @RetrievingEventData
+ * @/event/:username
+ */
+router.get("/:username", async(req,res)=>{
+    try{
+    let user = await User.findOne({username : req.params.username}).populate({
+        path: "events"
+    })
+    console.log("user populate ", user)
+    res.status(200).json({msg:"Populate event" , user})
+    }
+    catch(error){
+        res.status(400).json({err: error})
     }
 })
 
