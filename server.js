@@ -14,7 +14,7 @@ server.use(cors())
 
 //routes
 server.use("/auth", require("./routes/auth.routes"))
-server.use("/event",require("./routes/events.routes"))
+server.use("/event",require("./routes/event.routes"))
 server.use("/pusher", require("./routes/pusher.routes"))
 server.use("/dashboard", require("./routes/dashboard.routes"))
 
