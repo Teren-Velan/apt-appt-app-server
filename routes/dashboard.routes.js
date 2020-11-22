@@ -7,9 +7,9 @@ const User=  require("../models/user.model")
  * @RetrievingUserProfile
  * @/dashboard
  */
-router.get("/", async(req,res)=>{
+router.get("/:username", async(req,res)=>{
     try {
-        let user = await User.findOne({username : req.user.username})
+        let user = await User.findOne({username : req.params.username})
         return res.status(200).json({msg:"User data" , user})
     } catch (error) {
         return res.status(400).json({err: error})
