@@ -8,7 +8,7 @@ const blockSchema = new Schema({
         type: String
     },
     blockeddates: [{
-        type:String
+        type:Date
     }]
 })
 
@@ -23,11 +23,11 @@ const eventSchema = new Schema({
         required: true,
     },
     start_date:{
-        type: String,
+        type: Date,
         required: true,
     },
     end_date:{
-        type: String,
+        type: Date,
         required: true,
     },
     host:[{
@@ -40,6 +40,9 @@ const eventSchema = new Schema({
         type: String,
         default: "pending"
     },
+    availableDates:[{
+        type: Date
+    }],
     dateblocks: [blockSchema],
     comments:[commentSchema],
 })

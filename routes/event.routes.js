@@ -42,12 +42,26 @@ router.post("/:username/addevent", async (req,res)=>{
         if(!event_name || !start_date || !end_date){
             return res.status(400).json({msg: "Invalid Input"})
         }
-        let newEvent = await Event({
+
+        //adding 1 day to the end date
+        let end = new Date(end_date)
+        let enddate = end.setDate(end.getDate(end)+1)
+        const availableDates = []
+
+        for(i = new Date(start_date); i<enddate; i.setDate(i.getDate(i)+1)){
+            console.log("i", i)
+            availableDates.push(new Date(i))
+            console.log(availableDates)
+        }
+
+        let newEvent = new Event({
             event_name,
             start_date,
             end_date,
-            participants
+            participants,
+            availableDates
         })
+
         await newEvent.save()
 
 
@@ -181,4 +195,11 @@ router.delete("/:username/:eventid/participant/delete", async(req,res)=>{
     } 
 
 })
+
+/**
+ * @GET
+ * @GetAvailableDates
+ * @/event/:eventid/available
+ */
+
 module.exports = router
