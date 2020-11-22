@@ -6,6 +6,11 @@ const jwt = require("jsonwebtoken")
 require('dotenv').config()
 
 
+/**
+ * @method POST
+ * @url /auth/register
+ */
+
 router.post("/register", async (req, res) => {
   try {
     let {username, password} = req.body
@@ -31,7 +36,15 @@ router.post("/register", async (req, res) => {
   }
 })
 
-router.post('/login',
+
+
+/**
+ * @method POST
+ * @url /auth/login
+ */
+
+router.post(
+  '/login',
   async (req, res, next) => {
     passport.authenticate(
       'login',
