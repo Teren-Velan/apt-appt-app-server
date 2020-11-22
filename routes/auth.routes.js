@@ -31,9 +31,7 @@ router.post("/register", async (req, res) => {
   }
 })
 
-
-router.post(
-  '/login',
+router.post('/login',
   async (req, res, next) => {
     passport.authenticate(
       'login',

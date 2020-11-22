@@ -1,4 +1,5 @@
 const router = require("express").Router()
+const e = require("express")
 const Event = require("../models/event.model")
 const User=  require("../models/user.model")
 
@@ -10,6 +11,10 @@ const User=  require("../models/user.model")
 router.post("/:username/addevent", async (req,res)=>{
     try{
         let {event_name, start_date, end_date, participants} = req.body
+        let currentUser = await User.findOne({username: req.params.username})
+
+        participants.push(currentUser.username)
+
         if(!event_name || !start_date || !end_date){
             return res.status(400).json({msg: "Invalid Input"})
         }
@@ -21,7 +26,6 @@ router.post("/:username/addevent", async (req,res)=>{
         })
         await newEvent.save()
 
-        let currentUser = await User.findOne({username: req.params.username})
 
         //pushing the event to other invited Users
         participants.forEach(async (el)=>{
@@ -33,16 +37,30 @@ router.post("/:username/addevent", async (req,res)=>{
                 return res.status(400).json({msg: "Username do not exist"})
             }
         })
-
-        currentUser.events.push(newEvent)
-
-        await currentUser.save()
-
         return res.status(200).json({msg: "Event added!"})
     }catch(err){
         console.log(err)
         return res.status(400).json({err: err})
     }
+})
+
+/**
+ * @PUT
+ * @ModifyEvent
+ * 
+ */
+router.put("/:username/:eventid", async(req,res)=>{
+    try{
+        let {start_date,end_date,event_name} = req.body
+        let updates = {start_date,end_date,event_name}
+        await Event.findByIdAndUpdate(req.params.eventid, updates)
+        res.status(200).json({msg: "Event modified!"})
+        
+    }catch(error){
+        console.log(error)
+        res.status(400).json({err : error})
+    }
+    
 })
 
 /**
@@ -113,5 +131,30 @@ router.put("/dateblock/:username/:eventid", async(req,res)=>{
     }
 })
 
+/**
+ * @DELETE
+ * @DeletingSingleParticipantFromEvent
+ * @/event/:username/:eventid/:participant/delete
+ */
+router.delete("/:username/:eventid/participant/delete", async(req,res)=>{
+    try{   
+        let event = await Event.findOne({_id : req.params.eventid})
+        let {participant} = req.body
+        event.participants.forEach(async (el,index)=>{
+            if(el == participant){
+                event.participants.splice(index,1)
+                await event.save()
+            }
+        })
+        let outcast = await User.findOne({username : participant})
+        let index =  outcast.events.indexOf(req.params.eventid)
+        outcast.events.splice(index,1)
+        outcast.save()
+        res.status(200).json({msg:"Outcast removed"})
+    }catch(error){
+        console.log(error)
+        res.status(400).json({msg: error})
+    } 
 
+})
 module.exports = router
