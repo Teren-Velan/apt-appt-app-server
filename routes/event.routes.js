@@ -43,6 +43,7 @@ router.post("/:username/addevent", async (req,res)=>{
             return res.status(400).json({msg: "Invalid Input"})
         }
 
+
         //adding 1 day to the end date
         let end = new Date(end_date)
         let enddate = end.setDate(end.getDate(end)+1)
@@ -61,6 +62,7 @@ router.post("/:username/addevent", async (req,res)=>{
             participants,
             availableDates
         })
+
 
         await newEvent.save()
 
@@ -196,10 +198,12 @@ router.delete("/:username/:eventid/participant/delete", async(req,res)=>{
 
 })
 
+
 /**
  * @GET
  * @GetAvailableDates
  * @/event/:eventid/available
  */
+
 
 module.exports = router
