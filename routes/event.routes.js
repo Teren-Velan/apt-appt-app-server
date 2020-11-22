@@ -1,29 +1,27 @@
 const router = require("express").Router()
 const e = require("express")
 const Event = require("../models/event.model")
-const User=  require("../models/user.model")
+const User = require("../models/user.model")
 
 /**
  *@GET
  *@GetSingleEventDetails
- @/event/:username/:eventid 
+ @/event/:username/:eventid
  */
-router.get("/:username/:eventid", async(req,res)=>{
-    try{
-    let user = await User.findOne({username : req.params.username})
+router.get("/:username/:eventid", async (req, res) => {
+  try {
+    let user = await User.findOne({username: req.params.username})
     let event = await Event.findOne({_id: req.params.eventid})
     let eventexist = user.events.indexOf(event._id)
-    if(eventexist != -1){
-        return res.status(200).json({msg:"Single event details", event})
+    if (eventexist != -1) {
+      return res.status(200).json({msg: "Single event details", event})
+    } else {
+      return res.status(400).json({msg: "user does not have the event"})
     }
-    else{
-        return res.status(400).json({msg: "user does not have the event"})
-    }
-    }
-    catch(error){
-        console.log(error)
-        res.status(400).json({err :error})
-    }
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({err: error})
+  }
 
 })
 
@@ -32,127 +30,148 @@ router.get("/:username/:eventid", async(req,res)=>{
  * @POST
  * @AddNewEvents
  */
-router.post("/:username/addevent", async (req,res)=>{
-    try{
-        let {event_name, start_date, end_date, participants} = req.body
-        let currentUser = await User.findOne({username: req.params.username})
+router.post("/:username/addevent", async (req, res) => {
+  try {
+    let {event_name, start_date, end_date, participants} = req.body
+    let currentUser = await User.findOne({username: req.params.username})
 
-        participants.push(currentUser.username)
+    participants.push(currentUser.username)
 
-        if(!event_name || !start_date || !end_date){
-            return res.status(400).json({msg: "Invalid Input"})
-        }
-        let newEvent = await Event({
-            event_name,
-            start_date,
-            end_date,
-            participants
-        })
-        await newEvent.save()
-
-
-        //pushing the event to other invited Users
-        participants.forEach(async (el)=>{
-            try{
-                let invitee = await User.findOne({username : el})
-                invitee.events.push(newEvent)
-                await invitee.save()
-            }catch(err){
-                return res.status(400).json({msg: "Username do not exist"})
-            }
-        })
-        return res.status(200).json({msg: "Event added!"})
-    }catch(err){
-        console.log(err)
-        return res.status(400).json({err: err})
+    if (!event_name || !start_date || !end_date) {
+      return res.status(400).json({msg: "Invalid Input"})
     }
+    let newEvent = await Event({
+      event_name,
+      start_date,
+      end_date,
+      participants
+    })
+    await newEvent.save()
+
+
+    //pushing the event to other invited Users
+    participants.forEach(async (el) => {
+      try {
+        let invitee = await User.findOne({username: el})
+        invitee.events.push(newEvent)
+        await invitee.save()
+      } catch (err) {
+        return res.status(400).json({msg: "Username do not exist"})
+      }
+    })
+    return res.status(200).json({msg: "Event added!"})
+  } catch (err) {
+    console.log(err)
+    return res.status(400).json({err: err})
+  }
 })
 
 /**
  * @PUT
  * @ModifyEvent
- * 
+ *
  */
-router.put("/:username/:eventid", async(req,res)=>{
-    try{
-        let {start_date,end_date,event_name} = req.body
-        let updates = {start_date,end_date,event_name}
-        await Event.findByIdAndUpdate(req.params.eventid, updates)
-        res.status(200).json({msg: "Event modified!"})
-        
-    }catch(error){
-        console.log(error)
-        res.status(400).json({err : error})
-    }
-    
+router.put("/:username/:eventid", async (req, res) => {
+  try {
+    let {start_date, end_date, event_name} = req.body
+    let updates = {start_date, end_date, event_name}
+    await Event.findByIdAndUpdate(req.params.eventid, updates)
+    res.status(200).json({msg: "Event modified!"})
+
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({err: error})
+  }
+
 })
 
 /**
  * @get
  * @Searchbar
+ * @url /event
  */
-router.get("/", async(req,res)=>{
-    let {searchField} = req.body
+router.get("/", async (req, res) => {
+  let searchField = req.query.searchField
+  console.log(`searching for ${searchField}`)
+  if (searchField === "") {
+    res.status(400).json({msg: "invalid search"})
+  } else {
     let regex = new RegExp(searchField, "i")
     try {
-    let user = await User.find({username:regex}).select(["username"])
-        res.status(200).json({msg: "hiii", user})
+      let searchResults = await User.find({username: regex}).select(["username"])
+
+      if (searchResults.length > 0) {
+        res.status(200).json({msg: "users found", users: searchResults})
+      } else {
+        res.status(200).json({msg: "no matches"})
+      }
+
+
     } catch (error) {
-        res.status(400).json({err: error})
+      res.status(400).json({err: error})
     }
+  }
 })
 
 /**
  * @PUT
  * @UpdatingEventBlockedDates
  */
-router.put("/dateblock/:username/:eventid", async(req,res)=>{
-    try {
-        //getting the blocked dates user have selected in the front end
-        let {dates} = req.body
+router.put("/dateblock/:username/:eventid", async (req, res) => {
+  try {
+    //getting the blocked dates user have selected in the front end
+    let {dates} = req.body
 
-        //finding out who is the User who is blocking their dates
-        let currentUser = await User.findOne({username: req.params.username})
+    //finding out who is the User who is blocking their dates
+    let currentUser = await User.findOne({username: req.params.username})
 
-        //finding the specific Event
-        let currentEvent = await Event.findOne({_id: req.params.eventid})
+    //finding the specific Event
+    let currentEvent = await Event.findOne({_id: req.params.eventid})
 
-        //adding dateblock if user is the first one
-        if(currentEvent.dateblocks.length<1){
-            await Event.findByIdAndUpdate(req.params.eventid, {$push : {dateblocks: {
-                participant: currentUser.username,
-                blockeddates: dates
-            }}})
-            return res.status(200).json({msg: "Successfully updated the event blocked dates"})
+    //adding dateblock if user is the first one
+    if (currentEvent.dateblocks.length < 1) {
+      await Event.findByIdAndUpdate(req.params.eventid, {
+        $push: {
+          dateblocks: {
+            participant: currentUser.username,
+            blockeddates: dates
+          }
         }
-        
-        currentEvent.dateblocks.forEach(async (el,index)=>{
-            //overwrite user's previous block dates
-            if(currentUser.username == el.participant){
-                currentEvent.dateblocks.splice(index,1)
-                await currentEvent.save()
-                await Event.findByIdAndUpdate(req.params.eventid, {$push : {dateblocks: {
-                    participant: currentUser.username,
-                    blockeddates: dates
-                }}})
-                return res.status(200).json({msg: "Successfully Modified"})
-                }
-            else{
-                //adding user's block dates
-                await Event.findByIdAndUpdate(req.params.eventid, {$push : {dateblocks: {
-                    participant: currentUser.username,
-                    blockeddates: dates
-                }}})
-                return res.status(200).json({msg: "Successfully updated the event blocked dates"})
-            }
-            })
-            }
-            
-
-        catch (error) {
-        console.log(error)
-        return res.status(400).json({err: error})
+      })
+      return res.status(200).json({msg: "Successfully updated the event blocked dates"})
     }
+
+    currentEvent.dateblocks.forEach(async (el, index) => {
+      //overwrite user's previous block dates
+      if (currentUser.username == el.participant) {
+        currentEvent.dateblocks.splice(index, 1)
+        await currentEvent.save()
+        await Event.findByIdAndUpdate(req.params.eventid, {
+          $push: {
+            dateblocks: {
+              participant: currentUser.username,
+              blockeddates: dates
+            }
+          }
+        })
+        return res.status(200).json({msg: "Successfully Modified"})
+      } else {
+        //adding user's block dates
+        await Event.findByIdAndUpdate(req.params.eventid, {
+          $push: {
+            dateblocks: {
+              participant: currentUser.username,
+              blockeddates: dates
+            }
+          }
+        })
+        return res.status(200).json({msg: "Successfully updated the event blocked dates"})
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    return res.status(400).json({err: error})
+  }
 })
 
 /**
@@ -160,25 +179,25 @@ router.put("/dateblock/:username/:eventid", async(req,res)=>{
  * @DeletingSingleParticipantFromEvent
  * @/event/:username/:eventid/:participant/delete
  */
-router.delete("/:username/:eventid/participant/delete", async(req,res)=>{
-    try{   
-        let event = await Event.findOne({_id : req.params.eventid})
-        let {participant} = req.body
-        event.participants.forEach(async (el,index)=>{
-            if(el == participant){
-                event.participants.splice(index,1)
-                await event.save()
-            }
-        })
-        let outcast = await User.findOne({username : participant})
-        let index =  outcast.events.indexOf(req.params.eventid)
-        outcast.events.splice(index,1)
-        outcast.save()
-        res.status(200).json({msg:"Outcast removed"})
-    }catch(error){
-        console.log(error)
-        res.status(400).json({msg: error})
-    } 
+router.delete("/:username/:eventid/participant/delete", async (req, res) => {
+  try {
+    let event = await Event.findOne({_id: req.params.eventid})
+    let {participant} = req.body
+    event.participants.forEach(async (el, index) => {
+      if (el == participant) {
+        event.participants.splice(index, 1)
+        await event.save()
+      }
+    })
+    let outcast = await User.findOne({username: participant})
+    let index = outcast.events.indexOf(req.params.eventid)
+    outcast.events.splice(index, 1)
+    outcast.save()
+    res.status(200).json({msg: "Outcast removed"})
+  } catch (error) {
+    console.log(error)
+    res.status(400).json({msg: error})
+  }
 
 })
 module.exports = router
