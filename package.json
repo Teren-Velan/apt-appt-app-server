@@ -26,6 +26,7 @@
     "mongoose": "^5.10.15",
     "passport": "^0.4.1",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "pusher": "^4.0.1"
   }
 }

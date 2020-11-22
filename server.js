@@ -6,6 +6,8 @@ require('./lib/connection')
 const cors = require('cors')
 
 
+
+
 //middlewares
 server.use(express.json())
 server.use(cors())
@@ -13,6 +15,7 @@ server.use(cors())
 //routes
 server.use("/auth", require("./routes/auth.routes"))
 server.use("/event",require("./routes/events.routes"))
+server.use("/pusher", require("./routes/pusher.routes"))
 server.use("/dashboard", require("./routes/dashboard.routes"))
 
 
