@@ -8,7 +8,7 @@ const pusher = require('../lib/pusher')
  */
 
 router.post('/', async (req, res) => {
-  let {message} = req.body
+  let {message, channel, event} = req.body
   try {
     await pusher.trigger("my-channel", "my-event", {
       message: message
