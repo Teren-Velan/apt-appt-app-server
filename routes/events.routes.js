@@ -3,6 +3,30 @@ const e = require("express")
 const Event = require("../models/event.model")
 const User=  require("../models/user.model")
 
+/**
+ *@GET
+ *@GetSingleEventDetails
+ @/event/:username/:eventid 
+ */
+router.get("/:username/:eventid", async(req,res)=>{
+    try{
+    let user = await User.findOne({username : req.params.username})
+    let event = await Event.findOne({_id: req.params.eventid})
+    let eventexist = user.events.indexOf(event._id)
+    if(eventexist != -1){
+        return res.status(200).json({msg:"Single event details", event})
+    }
+    else{
+        return res.status(400).json({msg: "user does not have the event"})
+    }
+    }
+    catch(error){
+        console.log(error)
+        res.status(400).json({err :error})
+    }
+
+})
+
 
 /**
  * @POST
