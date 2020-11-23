@@ -12,7 +12,10 @@ const User = require("../models/user.model")
 router.get("/:eventid", async(req,res)=>{
     try{
     let user = await User.findOne({username : req.user.username})
-    let event = await Event.findOne({_id: req.params.eventid})
+    let event = await Event.findOne({_id: req.params.eventid}).populate({
+        path: "comments"
+    })
+    console.log(event)
     let eventexist = user.events.indexOf(event._id)
     if (eventexist != -1) {
       return res.status(200).json({msg: "Single event details", event})
