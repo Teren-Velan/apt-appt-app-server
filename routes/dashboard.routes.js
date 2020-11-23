@@ -36,6 +36,7 @@ router.get("/event", async(req,res)=>{
     return res.status(400).json({err: error})
     }
 })
+
 /**
  * @POST
  * @AddingFriend
