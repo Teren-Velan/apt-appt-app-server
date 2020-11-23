@@ -32,10 +32,10 @@ router.get("/:eventid", async(req,res)=>{
  * @POST
  * @AddNewEvents
  */
-router.post("/:username/addevent", async (req,res)=>{
+router.post("/addevent", async (req,res)=>{
     try{
         let {event_name, start_date, end_date, participants} = req.body
-        let currentUser = await User.findOne({username: req.params.username})
+        let currentUser = await User.findOne({username: req.user.username})
 
         participants.push(currentUser.username)
 
@@ -89,7 +89,7 @@ router.post("/:username/addevent", async (req,res)=>{
  * @ModifyEvent
  * 
  */
-router.put("/:username/:eventid", async(req,res)=>{
+router.put("/:eventid", async(req,res)=>{
     try{
         let {start_date,end_date,event_name} = req.body
         let updates = {start_date,end_date,event_name}
@@ -122,13 +122,13 @@ router.get("/", async(req,res)=>{
  * @PUT
  * @UpdatingEventBlockedDates
  */
-router.put("/dateblock/:username/:eventid", async(req,res)=>{
+router.put("/dateblock/:eventid", async(req,res)=>{
     try {
         //getting the blocked dates user have selected in the front end
         let {dates} = req.body
 
         //finding out who is the User who is blocking their dates
-        let currentUser = await User.findOne({username: req.params.username})
+        let currentUser = await User.findOne({username: req.user.username})
 
         //finding the specific Event
         let currentEvent = await Event.findOne({_id: req.params.eventid})
@@ -174,9 +174,9 @@ router.put("/dateblock/:username/:eventid", async(req,res)=>{
 /**
  * @DELETE
  * @DeletingSingleParticipantFromEvent
- * @/event/:username/:eventid/:participant/delete
+ * @/event/:eventid/:participant/delete
  */
-router.delete("/:username/:eventid/participant/delete", async(req,res)=>{
+router.delete("/:eventid/participant/delete", async(req,res)=>{
     try{   
         let event = await Event.findOne({_id : req.params.eventid})
         let {participant} = req.body
@@ -198,12 +198,6 @@ router.delete("/:username/:eventid/participant/delete", async(req,res)=>{
 
 })
 
-
-/**
- * @GET
- * @GetAvailableDates
- * @/event/:eventid/available
- */
 
 
 module.exports = router
