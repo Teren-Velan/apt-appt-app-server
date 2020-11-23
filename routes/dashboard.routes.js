@@ -17,6 +17,33 @@ router.get("/" , async(req,res)=>{
     }
 })
 
+/**
+ * @POST
+ * @AddingNewEventToDashBoard
+ * @/dashboard/addEvent
+ */
+router.post("/addEvent", async(req,res)=>{
+    try{
+        let {description, event_name} = req.body
+        if (!event_name){
+            return res.status(400).json({msg:"Please feel in event Name"})
+        }
+        let newEvent = new Event({
+            event_name,
+            description
+        })
+
+        let currentUser = await User.findOne({username: req.user.username})
+        await newEvent.save()
+        currentUser.events.push(newEvent)
+        await currentUser.save()
+        return res.status(200).json({msg: "newEvent Saved"})
+    }catch(error){
+        console.log(error)
+        return res.status(400).json({error: error})
+    }
+    
+})
 
 /**
  * @GET
@@ -40,7 +67,7 @@ router.get("/event", async(req,res)=>{
 /**
  * @POST
  * @AddingFriend
- * @/dashboard/:username/adddfriend
+ * @/dashboard/addfriend
  */
 router.post("/addfriend",async(req,res)=>{
     try {

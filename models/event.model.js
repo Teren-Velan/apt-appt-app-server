@@ -22,13 +22,15 @@ const eventSchema = new Schema({
         type: String,
         required: true,
     },
+    description:{
+        type: String,
+        default: "",
+    },
     start_date:{
         type: Date,
-        required: true,
     },
     end_date:{
         type: Date,
-        required: true,
     },
     host:[{
         type: String,

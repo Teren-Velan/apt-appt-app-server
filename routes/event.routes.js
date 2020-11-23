@@ -13,6 +13,7 @@ router.get("/:eventid", async(req,res)=>{
     try{
     let user = await User.findOne({username : req.user.username})
     let event = await Event.findOne({_id: req.params.eventid})
+    console.log(event)
     let eventexist = user.events.indexOf(event._id)
     if (eventexist != -1) {
       return res.status(200).json({msg: "Single event details", event})
@@ -30,6 +31,7 @@ router.get("/:eventid", async(req,res)=>{
 /**
  * @POST
  * @AddNewEvents
+ * @DoNotUse
  */
 
 router.post("/addevent", async (req,res)=>{
@@ -187,12 +189,40 @@ router.put("/dateblock/:eventid", async(req,res)=>{
 })
 
 /**
+ * @POST
+ * @AddingSingleParticipantFromEvent
+ * @/event/:eventid/participant/add
+ */
+router.post("/:eventid/participant/add",async(req,res)=>{
+  try{
+   let {participant} = req.body
+   let event = await Event.findOne({_id: req.params.eventid})
+   let user = await User.findOne({username: participant})
+   //Frontend to send an object participant
+   let index = event.participants.indexOf((el)=>{
+     el == participant
+   })
+   if (index == -1){
+     event.participants.push(participant)
+     user.events.push(event)
+     await user.save()
+     await event.save()
+     return res.status(200).json({msg: "Participant added"})
+   }
+   else{
+     return res.status(200).json({msg: "Participant already added"})
+   }
+  }catch(error){
+    console.log(error)
+    res.status(400).json({err: error})
+  }
+})
+
+/**
  * @DELETE
  * @DeletingSingleParticipantFromEvent
- * @/event/:eventid/:participant/delete
+ * @/event/:eventid/participant/delete
  */
-
-
 router.delete("/:eventid/participant/delete", async(req,res)=>{
     try{   
         let event = await Event.findOne({_id : req.params.eventid})
@@ -244,5 +274,6 @@ router.put("/:eventid/modifydates" , async(req,res)=>{
         res.status(400).json({err : error})
     }
 })
+
 
 module.exports = router
