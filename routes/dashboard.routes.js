@@ -25,6 +25,7 @@ router.get("/" , async(req,res)=>{
  */
 router.get("/event", async(req,res)=>{
     try{
+        console.log("you reach here")
     let user = await User.findOne({username : req.user.username}).populate({
         path: "events",
     }).select(["events"])
