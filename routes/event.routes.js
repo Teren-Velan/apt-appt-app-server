@@ -8,9 +8,9 @@ const User=  require("../models/user.model")
  *@GetSingleEventDetails
  @/event/:username/:eventid 
  */
-router.get("/:username/:eventid", async(req,res)=>{
+router.get("/:eventid", async(req,res)=>{
     try{
-    let user = await User.findOne({username : req.params.username})
+    let user = await User.findOne({username : req.user.username})
     let event = await Event.findOne({_id: req.params.eventid})
     let eventexist = user.events.indexOf(event._id)
     if(eventexist != -1){
