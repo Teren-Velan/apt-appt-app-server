@@ -40,7 +40,7 @@ router.get("/event", async(req,res)=>{
 /**
  * @POST
  * @AddingFriend
- * @/dashboard/:username/adddfriend
+ * @/dashboard/addfriend
  */
 router.post("/addfriend",async(req,res)=>{
     try {
