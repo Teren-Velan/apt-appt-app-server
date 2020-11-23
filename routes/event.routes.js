@@ -205,6 +205,7 @@ router.delete("/:eventid/participant/delete", async(req,res)=>{
  */
 router.put("/:eventid/modifydates" , async(req,res)=>{
     try{
+        console.log("body here : " , req.body)
         let event = await Event.findOne({_id : req.params.eventid})
         let {start_date, end_date} = req.body
         event.start_date = start_date
