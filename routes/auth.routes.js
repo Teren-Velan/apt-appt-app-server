@@ -20,7 +20,6 @@ router.post("/register", async (req, res) => {
       res.status(400).json({msg: "Username has already been registered"})
     }
 
-    // let hash = await bcrypt.hash(password, 10)
 
     let newUser = new User({
       username,

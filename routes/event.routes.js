@@ -105,8 +105,6 @@ router.get("/", async (req, res) => {
       } else {
         res.status(200).json({msg: "no matches"})
       }
-
-
     } catch (error) {
       res.status(400).json({err: error})
     }
