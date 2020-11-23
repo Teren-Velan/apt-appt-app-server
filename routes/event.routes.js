@@ -66,18 +66,6 @@ router.post("/addevent", async (req,res)=>{
 
         await newEvent.save()
 
-    if (!event_name || !start_date || !end_date) {
-      return res.status(400).json({msg: "Invalid Input"})
-    }
-    let newEvent = await Event({
-      event_name,
-      start_date,
-      end_date,
-      participants
-    })
-    await newEvent.save()
-
-
     //pushing the event to other invited Users
     participants.forEach(async (el) => {
       try {
@@ -145,7 +133,6 @@ router.get("/", async (req, res) => {
  * @PUT
  * @UpdatingEventBlockedDates
  */
-
 router.put("/dateblock/:eventid", async(req,res)=>{
     try {
         //getting the blocked dates user have selected in the front end
@@ -165,9 +152,6 @@ router.put("/dateblock/:eventid", async(req,res)=>{
             }}})
             return res.status(200).json({msg: "Successfully updated the event blocked dates"})
         }
-      })
-      return res.status(200).json({msg: "Successfully updated the event blocked dates"})
-    }
 
     currentEvent.dateblocks.forEach(async (el, index) => {
       //overwrite user's previous block dates
