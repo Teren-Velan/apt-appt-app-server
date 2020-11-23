@@ -9,7 +9,7 @@ const User=  require("../models/user.model")
  */
 router.get("/" , async(req,res)=>{
     try {
-        let user = await User.findOne({username: req.params.username}).populate("friendlist", "username").select(["username","email","friendlist"])
+        let user = await User.findOne({username: req.user.username}).populate("friendlist", "username").select(["username","email","friendlist"])
         res.status(200).json({msg: "Successfully retrieved friendlist", user})
     } catch (error) {
         console.log(error)
@@ -23,9 +23,9 @@ router.get("/" , async(req,res)=>{
  * @RetrievingUserEventData
  * @/dashboard/:username
  */
-router.get("/:username/event", async(req,res)=>{
+router.get("/event", async(req,res)=>{
     try{
-    let user = await User.findOne({username : req.params.username}).populate({
+    let user = await User.findOne({username : req.user.username}).populate({
         path: "events",
     }).select(["events"])
     console.log("user populate ", user)
@@ -40,9 +40,9 @@ router.get("/:username/event", async(req,res)=>{
  * @AddingFriend
  * @/dashboard/:username/adddfriend
  */
-router.post("/:username/addfriend",async(req,res)=>{
+router.post("/addfriend",async(req,res)=>{
     try {
-        let user = await User.findOne({username : req.params.username})
+        let user = await User.findOne({username : req.user.username})
         let {username} = req.body
         let friend = await User.findOne({username})
         
