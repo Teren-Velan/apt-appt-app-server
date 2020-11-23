@@ -4,7 +4,7 @@ const server = express()
 require('dotenv').config()
 require('./lib/connection')
 const cors = require('cors')
-
+const passport = require('./lib/auth');
 
 
 
