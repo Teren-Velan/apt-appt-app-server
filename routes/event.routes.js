@@ -198,6 +198,33 @@ router.delete("/:eventid/participant/delete", async(req,res)=>{
 
 })
 
+/**
+ * @PUT
+ * @ChangingStartAndEndDate
+ * /event/:eventid/modifydates
+ */
+router.put("/:eventid/modifydates" , async(req,res)=>{
+    try{
+        let event = await Event.findOne({_id : req.params.eventid})
+        let {start_date, end_date} = req.body
+        event.start_date = start_date
+        event.end_date = end_date
+        let end = new Date(end_date)
+        let enddate = end.setDate(end.getDate(end)+1)
+        let availableDates = []
 
+        for(i = new Date(start_date); i<enddate; i.setDate(i.getDate(i)+1)){
+            console.log("i", i)
+            availableDates.push(new Date(i))
+            console.log(availableDates)
+        }
+        event.availableDates = availableDates
+        await event.save()
+        res.status(200).json({msg: "Changed dates"})
+    } catch(error){
+        console.log(error)
+        res.status(400).json({err : error})
+    }
+})
 
 module.exports = router
