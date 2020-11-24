@@ -28,9 +28,13 @@ router.post("/addEvent", async(req,res)=>{
         if (!event_name){
             return res.status(400).json({msg:"Please feel in event Name"})
         }
+        let participants = []
+        
+        participants.push(req.user.username)
         let newEvent = new Event({
             event_name,
-            description
+            description,
+            participants
         })
 
         let currentUser = await User.findOne({username: req.user.username})
