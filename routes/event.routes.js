@@ -278,16 +278,17 @@ router.put("/:eventid/modifydates" , async(req,res)=>{
 /**
  * @AddingChatToEvent
  * @PUT
- * @/event/:eventid/chat/update
+ * @/event/:eventid/chat/add
  */
 router.post("/:eventid/chat/add",async(req,res)=>{
+  console.log(req.body)
   try {
     let event = await Event.findOne({_id : req.params.eventid})
     let user = req.user.username
-    let {comments} = req.body
+    let {message} = req.body
 
-    event.chat.push({commenter : user,
-      comment : comments})
+    event.chat.push({username : user,
+      message : message})
       await event.save()
       res.status(200).json({msg: "chat added"})
   } catch (error) {
