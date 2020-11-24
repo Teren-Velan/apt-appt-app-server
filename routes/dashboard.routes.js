@@ -77,7 +77,7 @@ router.post("/addfriend",async(req,res)=>{
         if(!friend){
             return res.status(400).json({msg:"friend do not exist"})
         }
-        let existed = user.friendlist.indexOf(friend._id)ad
+        let existed = user.friendlist.indexOf(friend._id)
         let existed2 = friend.friendlist.indexOf(user._id)
         if(existed == -1){
             user.friendlist.push(friend)
@@ -125,5 +125,10 @@ router.delete("/:eventid/delete", async(req,res)=>{
         
     })
 })
+
+
+
+
+
 
 module.exports = router
