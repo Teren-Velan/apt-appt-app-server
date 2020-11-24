@@ -6,6 +6,11 @@ const jwt = require("jsonwebtoken")
 require('dotenv').config()
 
 
+/**
+ * @method POST
+ * @url /auth/register
+ */
+
 router.post("/register", async (req, res) => {
   try {
     let {username, password} = req.body
@@ -15,7 +20,6 @@ router.post("/register", async (req, res) => {
       res.status(400).json({msg: "Username has already been registered"})
     }
 
-    // let hash = await bcrypt.hash(password, 10)
 
     let newUser = new User({
       username,
@@ -31,6 +35,12 @@ router.post("/register", async (req, res) => {
   }
 })
 
+
+
+/**
+ * @method POST
+ * @url /auth/login
+ */
 
 router.post(
   '/login',
@@ -69,7 +79,7 @@ router.post(
 
 router.get("/tokencheck", passport.authenticate('jwt', {session: false}), async (req, res) => {
   try {
-    let user = await User.findOne({username: req.user.username})
+    let user = await User.findOne({username: req.user.username}).populate()
     res.status(200).json({msg: "here is your data", user})
   } catch (error) {
     console.log("backend user token error", error)

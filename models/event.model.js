@@ -1,4 +1,6 @@
 const mongoose = require("mongoose")
+const { model } = require("./user.model")
+const User = require("./user.model")
 const {Schema} = mongoose
 
 const blockSchema = new Schema({
@@ -6,21 +8,29 @@ const blockSchema = new Schema({
         type: String
     },
     blockeddates: [{
-        type:String
+        type:Date
     }]
 })
+
+const messageSchema = new Schema({
+    username : String,
+    message: String,
+},{timestamps: true})
+
 const eventSchema = new Schema({
     event_name:{
         type: String,
         required: true,
     },
-    start_date:{
+    description:{
         type: String,
-        required: true,
+        default: "",
+    },
+    start_date:{
+        type: Date,
     },
     end_date:{
-        type: String,
-        required: true,
+        type: Date,
     },
     host:[{
         type: String,
@@ -32,7 +42,11 @@ const eventSchema = new Schema({
         type: String,
         default: "pending"
     },
-    dateblocks: [blockSchema]
+    availableDates:[{
+        type: Date
+    }],
+    dateblocks: [blockSchema],
+    chat:[messageSchema],
 })
 
 const Event = mongoose.model("Event", eventSchema)
