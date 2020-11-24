@@ -199,19 +199,17 @@ router.post("/:eventid/participant/add",async(req,res)=>{
    let event = await Event.findOne({_id: req.params.eventid})
    let user = await User.findOne({username: participant})
    //Frontend to send an object participant
-   let index = event.participants.indexOf((el)=>{
-     el == participant
-   })
-   if (index == -1){
-     event.participants.push(participant)
-     user.events.push(event)
-     await user.save()
-     await event.save()
-     return res.status(200).json({msg: "Participant added"})
-   }
-   else{
-     return res.status(200).json({msg: "Participant already added"})
-   }
+   let index = event.participants.indexOf(participant)
+     if(index != -1){
+        return res.status(200).json({msg: "Participant already added"})
+     }
+     else{
+      event.participants.push(participant)
+      user.events.push(event)
+      await user.save()
+      await event.save()
+      return res.status(200).json({msg: "Participant added"})
+     }
   }catch(error){
     console.log(error)
     res.status(400).json({err: error})
