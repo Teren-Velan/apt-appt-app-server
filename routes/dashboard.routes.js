@@ -52,12 +52,11 @@ router.post("/addEvent", async(req,res)=>{
  */
 router.get("/event", async(req,res)=>{
     try{
-        console.log("you reach here")
-    let user = await User.findOne({username : req.user.username}).populate({
-        path: "events",
-    }).select(["events"])
-    console.log("user populate ", user)
-    return res.status(200).json({msg:"Populate event" , user})
+        let user = await User.findOne({username : req.user.username}).populate({
+            path: "events",
+        }).select(["events"])
+        console.log("user populate ", user)
+        return res.status(200).json({msg:"Populate event" , user})
     }
     catch(error){
     return res.status(400).json({err: error})
@@ -78,7 +77,7 @@ router.post("/addfriend",async(req,res)=>{
         if(!friend){
             return res.status(400).json({msg:"friend do not exist"})
         }
-        let existed = user.friendlist.indexOf(friend._id)
+        let existed = user.friendlist.indexOf(friend._id)ad
         let existed2 = friend.friendlist.indexOf(user._id)
         if(existed == -1){
             user.friendlist.push(friend)

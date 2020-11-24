@@ -11,9 +11,9 @@ const User = require("../models/user.model")
 
 router.get("/:eventid", async(req,res)=>{
     try{
+      console.log("hi")
     let user = await User.findOne({username : req.user.username})
     let event = await Event.findOne({_id: req.params.eventid})
-    console.log(event)
     let eventexist = user.events.indexOf(event._id)
     if (eventexist != -1) {
       return res.status(200).json({msg: "Single event details", event})
@@ -106,7 +106,7 @@ router.put("/:eventid", async(req,res)=>{
 })
 
 /**
- * @get
+ * @GET
  * @Searchbar
  * @url /event
  */

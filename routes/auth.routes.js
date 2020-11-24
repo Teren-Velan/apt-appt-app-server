@@ -79,7 +79,7 @@ router.post(
 
 router.get("/tokencheck", passport.authenticate('jwt', {session: false}), async (req, res) => {
   try {
-    let user = await User.findOne({username: req.user.username})
+    let user = await User.findOne({username: req.user.username}).populate()
     res.status(200).json({msg: "here is your data", user})
   } catch (error) {
     console.log("backend user token error", error)
