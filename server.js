@@ -14,7 +14,7 @@ server.use(cors())
 
 //routes
 server.use("/auth", require("./routes/auth.routes"))
-server.use("/event",passport.authenticate('jwt', { session: false }) ,require("./routes/event.routes"))
+server.use("/event", passport.authenticate('jwt', { session: false }), require("./routes/event.routes"))
 server.use("/pusher", require("./routes/pusher.routes"))
 server.use("/dashboard",passport.authenticate('jwt', { session: false }), require("./routes/dashboard.routes"))
 

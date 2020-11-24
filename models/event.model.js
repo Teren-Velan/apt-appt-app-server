@@ -12,10 +12,10 @@ const blockSchema = new Schema({
     }]
 })
 
-const commentSchema = new Schema({
-    commenter : String,
-    comment: String,
-},{timestamp: true})
+const messageSchema = new Schema({
+    username : String,
+    message: String,
+},{timestamps: true})
 
 const eventSchema = new Schema({
     event_name:{
@@ -46,7 +46,7 @@ const eventSchema = new Schema({
         type: Date
     }],
     dateblocks: [blockSchema],
-    chat:[commentSchema],
+    chat:[messageSchema],
 })
 
 const Event = mongoose.model("Event", eventSchema)
