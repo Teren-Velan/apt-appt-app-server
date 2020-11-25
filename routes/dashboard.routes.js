@@ -29,12 +29,17 @@ router.post("/addEvent", async(req,res)=>{
             return res.status(400).json({msg:"Please feel in event Name"})
         }
         let participants = []
-        
+        let dateblocks = {
+            _id : req.user._id,
+            participant: req.user.username,
+            blockeddates: []
+        }
         participants.push(req.user.username)
         let newEvent = new Event({
             event_name,
             description,
-            participants
+            participants,
+            dateblocks
         })
 
         let currentUser = await User.findOne({username: req.user.username})
