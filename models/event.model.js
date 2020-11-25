@@ -8,7 +8,7 @@ const blockSchema = new Schema({
         type: String
     },
     blockeddates: [{
-        type:Date
+        type: Date
     }]
 })
 
