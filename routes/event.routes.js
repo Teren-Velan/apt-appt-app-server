@@ -11,7 +11,6 @@ const User = require("../models/user.model")
 
 router.get("/:eventid", async(req,res)=>{
     try{
-      console.log("hi")
     let user = await User.findOne({username : req.user.username})
     let event = await Event.findOne({_id: req.params.eventid})
     let eventexist = user.events.indexOf(event._id)
@@ -21,7 +20,6 @@ router.get("/:eventid", async(req,res)=>{
       return res.status(400).json({msg: "user does not have the event"})
     }
   } catch (error) {
-    console.log(error)
     res.status(400).json({err: error})
   }
 
@@ -52,9 +50,7 @@ router.post("/addevent", async (req,res)=>{
         const availableDates = []
 
         for(i = new Date(start_date); i<enddate; i.setDate(i.getDate(i)+1)){
-            console.log("i", i)
             availableDates.push(new Date(i))
-            console.log(availableDates)
         }
 
         let newEvent = new Event({
@@ -80,7 +76,6 @@ router.post("/addevent", async (req,res)=>{
     })
     return res.status(200).json({msg: "Event added!"})
   } catch (err) {
-    console.log(err)
     return res.status(400).json({err: err})
   }
 })
@@ -99,7 +94,6 @@ router.put("/:eventid", async(req,res)=>{
         res.status(200).json({msg: "Event modified!"})
         
     }catch(error){
-        console.log(error)
         res.status(400).json({err : error})
     }
     
@@ -112,7 +106,6 @@ router.put("/:eventid", async(req,res)=>{
  */
 router.get("/", async (req, res) => {
   let searchField = req.query.searchField
-  console.log(`searching for ${searchField}`)
   if (searchField === "") {
     res.status(400).json({msg: "invalid search"})
   } else {
@@ -183,7 +176,6 @@ router.put("/dateblock/:eventid", async(req,res)=>{
       }
     })
   } catch (error) {
-    console.log(error)
     return res.status(400).json({err: error})
   }
 })
@@ -198,14 +190,9 @@ router.put('/:eventid/dateblock', async (req, res) => {
   try {
     let event = await Event.findOne({_id: req.params.eventid})
     let index = event.dateblocks.findIndex(dateblock => dateblock.participant === req.user.username)
-    // check if user exist yet
     if (index > -1) {
-      // check if date exist
-      // let dateObj = new Date(req.body.date.toString())
-      // console.log(dateObj)
       let dateIndex = event.dateblocks[index].blockeddates.findIndex(date => date.toString() === (new Date(req.body.date)).toString())
       if (dateIndex > -1){
-        console.log("here")
         event.dateblocks[index].blockeddates.splice(dateIndex, 1)
         await event.save()
         return res.status(200).json({message: "success"})
@@ -259,33 +246,46 @@ router.post("/:eventid/participant/add",async(req,res)=>{
       return res.status(200).json({msg: "Participant added"})
      }
   }catch(error){
-    console.log(error)
     res.status(400).json({err: error})
   }
 })
 
 /**
- * @DELETE
+ * @put
  * @DeletingSingleParticipantFromEvent
  * @/event/:eventid/participant/delete
  */
-router.delete("/:eventid/participant/delete", async(req,res)=>{
-    try{   
+router.put("/:eventid/participant/delete", async(req,res)=>{
+    try{ 
         let event = await Event.findOne({_id : req.params.eventid})
         let {participant} = req.body
+        if(participant == req.user.username){
+          return res.status(200).json({msg:"You can remove yourself"})
+        }
+        console.log(participant)
         event.participants.forEach(async (el,index)=>{
             if(el == participant){
                 event.participants.splice(index,1)
-                await event.save()
             }
+        })
+        event.dateblocks.forEach((el,index)=>{
+          if(el.participant === participant){
+            event.dateblocks.splice(index,1)
+          }
+        })
+        event.readyUsers.forEach((el,index)=>{
+          if(el.participant === participant){
+            event.readyUsers.splice(index,1)
+          }
         })
         let outcast = await User.findOne({username : participant})
         let index =  outcast.events.indexOf(req.params.eventid)
         outcast.events.splice(index,1)
+        await event.save()
         outcast.save()
         res.status(200).json({msg:"Outcast removed"})
     }catch(error){
-        console.log(error)
+      console.log(error)
         res.status(400).json({msg: error})
     } 
 
@@ -298,7 +298,6 @@ router.delete("/:eventid/participant/delete", async(req,res)=>{
  */
 router.put("/:eventid/modifydates" , async(req,res)=>{
     try{
-        console.log("body here : " , req.body)
         let event = await Event.findOne({_id : req.params.eventid})
         let {start_date, end_date} = req.body
         event.start_date = start_date
@@ -308,15 +307,12 @@ router.put("/:eventid/modifydates" , async(req,res)=>{
         let availableDates = []
 
         for(i = new Date(start_date); i<enddate; i.setDate(i.getDate(i)+1)){
-            console.log("i", i)
             availableDates.push(new Date(i))
-            console.log(availableDates)
         }
         event.availableDates = availableDates
         await event.save()
         res.status(200).json({msg: "Changed dates"})
     } catch(error){
-        console.log(error)
         res.status(400).json({err : error})
     }
 })
@@ -327,7 +323,6 @@ router.put("/:eventid/modifydates" , async(req,res)=>{
  * @/event/:eventid/chat/add
  */
 router.post("/:eventid/chat/add",async(req,res)=>{
-  console.log(req.body)
   try {
     let event = await Event.findOne({_id : req.params.eventid})
     let user = req.user.username
@@ -338,7 +333,6 @@ router.post("/:eventid/chat/add",async(req,res)=>{
       await event.save()
       res.status(200).json({msg: "chat added"})
   } catch (error) {
-    console.log(error)
     res.status(400).json({err: error})
   }
 })
@@ -390,19 +384,24 @@ router.put("/:eventid/confirm",async(req,res)=>{
         return res.status(200).json({msg: "Event updated"})
     }
     else{
-      if(event.confirmedDate.toString() == new Date(date).toString()) {
-        console.log("yoo")
-        event.confirmedDate = ""
-        event.status = "Ready"
-        await event.save()
-        return res.status(200).json({msg: "Event updated"})
-      }
-      else {
+
+      if(event.confirmedDate == null){
         event.confirmedDate = date
         event.status = "Confirmed"
         await event.save()
         return res.status(200).json({msg: "Event updated"})
       }
+      if((new Date(date)).toString() == event.confirmedDate.toString()){
+        event.status = "Ready"
+        event.confirmedDate = ""
+        await event.save()
+        return res.status(200).json({msg: "Event updated"})
+      }
+      event.confirmedDate = date
+        event.status = "Confirmed"
+        await event.save()
+        return res.status(200).json({msg: "Event updated"})
+
     }
   }catch(error){
     res.status(400).json({error: error})
