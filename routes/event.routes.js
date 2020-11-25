@@ -256,8 +256,10 @@ router.post("/:eventid/participant/add",async(req,res)=>{
  * @/event/:eventid/participant/delete
  */
 router.put("/:eventid/participant/delete", async(req,res)=>{
+  
     try{ 
         let event = await Event.findOne({_id : req.params.eventid})
+        if(req.user.username == event.host[0]){
         let {participant} = req.body
         if(participant == req.user.username){
           return res.status(200).json({msg:"You can remove yourself"})
@@ -274,8 +276,8 @@ router.put("/:eventid/participant/delete", async(req,res)=>{
           }
         })
         event.readyUsers.forEach((el,index)=>{
-          if(el.participant === participant){
-            event.readyUsers.splice(index,1)
+          if(el === participant){
+            event.readyUsers.splice(index,1) 
           }
         })
         let outcast = await User.findOne({username : participant})
@@ -284,6 +286,7 @@ router.put("/:eventid/participant/delete", async(req,res)=>{
         await event.save()
         outcast.save()
         res.status(200).json({msg:"Outcast removed"})
+      }
     }catch(error){
       console.log(error)
         res.status(400).json({msg: error})
