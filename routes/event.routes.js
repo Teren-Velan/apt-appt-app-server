@@ -197,7 +197,7 @@ router.put("/dateblock/:eventid", async(req,res)=>{
 router.put('/:eventid/dateblock', async (req, res) => {
   try {
     let event = await Event.findOne({_id: req.params.eventid})
-    console.log(req.body.date)
+    console.log("req.body.date:",req.body.date)
     let index = event.dateblocks.findIndex(dateblock => dateblock.participant === req.user.username)
     console.log(index)
     // check if user exist yet
@@ -206,11 +206,11 @@ router.put('/:eventid/dateblock', async (req, res) => {
       console.log("check if date exist")
       console.log(event.dateblocks[index].blockeddates[0])
       console.log(req.body.date)
-      let dateObj = new Date(req.body.date.toString())
-      console.log(dateObj)
-      let dateIndex = event.dateblocks[index].blockeddates.findIndex(date => date === dateObj)
+      // let dateObj = new Date(req.body.date.toString())
+      // console.log(dateObj)
+      let dateIndex = event.dateblocks[index].blockeddates.findIndex(date => date === req.body.date)
       for (const date of event.dateblocks[index].blockeddates) {
-        console.log(date)
+        // console.log(date)
       }
       console.log(dateIndex)
       if (dateIndex > -1){
