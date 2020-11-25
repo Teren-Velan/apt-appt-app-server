@@ -354,6 +354,11 @@ router.put("/:eventid/ready",async(req,res)=>{
     let index = event.readyUsers.indexOf(req.user.username)
     if(index == -1){
       event.readyUsers.push(req.user.username)
+      if(event.readyUsers.length == event.participants.length){
+        event.status = "Ready"
+        await event.save()
+        return res.status(200).json({msg: "I'm Ready!"})
+      }
       await event.save()
       return res.status(200).json({msg: "I'm Ready!"})
     }
@@ -379,7 +384,7 @@ router.put("/:eventid/confirm",async(req,res)=>{
     }
     else{
       event.completedDate = date
-      event.status = "Completed"
+      event.status = "Confirmed"
       await event.save()
       return res.status(200).json({msg: "Event updated"})
     }

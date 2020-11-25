@@ -40,7 +40,7 @@ const eventSchema = new Schema({
     }],
     status:{
         type: String,
-        default: "pending"
+        default: "Pending"
     },
     availableDates:[{
         type: Date
@@ -50,8 +50,9 @@ const eventSchema = new Schema({
     readyUsers: [{
         type: String
     }],
-    completedDate: {
-        type : Date
+    confirmedDate: {
+        type : Date,
+        default: ""
     }
 })
 
