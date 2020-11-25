@@ -49,7 +49,10 @@ const eventSchema = new Schema({
     chat:[messageSchema],
     readyUsers: [{
         type: String
-    }]
+    }],
+    completedDate: {
+        type : Date
+    }
 })
 
 const Event = mongoose.model("Event", eventSchema)
