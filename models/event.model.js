@@ -47,6 +47,9 @@ const eventSchema = new Schema({
     }],
     dateblocks: [blockSchema],
     chat:[messageSchema],
+    readyUsers: [{
+        type: String
+    }]
 })
 
 const Event = mongoose.model("Event", eventSchema)

@@ -34,12 +34,14 @@ router.post("/addEvent", async(req,res)=>{
             participant: req.user.username,
             blockeddates: []
         }
+        let host = [req.user.username]
         participants.push(req.user.username)
         let newEvent = new Event({
             event_name,
             description,
             participants,
-            dateblocks
+            dateblocks,
+            host
         })
 
         let currentUser = await User.findOne({username: req.user.username})
@@ -82,7 +84,12 @@ router.post("/addfriend",async(req,res)=>{
         let user = await User.findOne({username : req.user.username})
         let {username} = req.body
         let friend = await User.findOne({username})
-        
+        console.log("requser", req.user.username)
+        console.log("bodyuser", username)
+        console.log(req.user.username == username)
+        if(req.user.username == username){
+            return res.status(200).json({msg:"Its yourself"})
+        }
         if(!friend){
             return res.status(400).json({msg:"friend do not exist"})
         }
