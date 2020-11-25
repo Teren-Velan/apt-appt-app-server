@@ -343,4 +343,29 @@ router.post("/:eventid/chat/add",async(req,res)=>{
   }
 })
 
+/**
+ * @PUT
+ * @UserReady
+ * /event/:eventid/userReady
+ */
+router.put("/:eventid/ready",async(req,res)=>{
+  try{
+    let event = await Event.findOne({_id : req.params.eventid})
+    let index = event.readyUsers.indexOf(req.user.username)
+    if(index == -1){
+      event.readyUsers.push(req.user.username)
+      await event.save()
+      res.status(200).json({msg: "I'm Ready!"})
+    }
+    else{
+      event.readyUsers.splice(index,1)
+      await event.save()
+      res.status(200).json({msg: "I'm UnReady!"})
+    }
+  }catch(error){
+    return res.status(400).json({err: error})
+  }
+})
+
+
 module.exports = router
