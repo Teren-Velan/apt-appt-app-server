@@ -22,11 +22,12 @@ router.post('/trigger', async (req, res) => {
 })
 
 router.post('/typing', async (req, res) => {
-  let {channel, user} = req.body
-  console.log(req.body)
+  let {channel, user, typing} = req.body
+  // console.log(req.body)
   try {
     await pusher.trigger(channel, "typing", {
-      user: user
+      user: user,
+      typing: typing
     })
   } catch (err) {
     res.status(400).json({message: "not successful"})
