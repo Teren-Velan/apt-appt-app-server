@@ -190,6 +190,13 @@ router.put('/:eventid/dateblock', async (req, res) => {
   try {
     let event = await Event.findOne({_id: req.params.eventid})
     let index = event.dateblocks.findIndex(dateblock => dateblock.participant === req.user.username)
+    let readyUserIndex = event.readyUsers.indexOf(req.user.username)
+      console.log("readyUserIndex: ", readyUserIndex)
+      if (readyUserIndex > -1){
+        event.readyUsers.splice(readyUserIndex,1)
+      }
+      event.status = "Pending"
+
     if (index > -1) {
       let dateIndex = event.dateblocks[index].blockeddates.findIndex(date => date.toString() === (new Date(req.body.date)).toString())
       if (dateIndex > -1){
@@ -207,6 +214,7 @@ router.put('/:eventid/dateblock', async (req, res) => {
         participant: req.user.username,
         bloackeddates: newBlockedDates
       })
+
       await event.save()
       return res.status(200).json({message: "success"})
     }
