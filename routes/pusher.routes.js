@@ -9,10 +9,10 @@ const pusher = require('../lib/pusher')
 
 router.post('/trigger', async (req, res) => {
   let {channel} = req.body
-  console.log(channel)
+  // console.log(channel)
   try {
     await pusher.trigger(channel, "trigger", {
-      message: "a message was sent"
+      message: "trigger refresh"
     });
     res.status(200).json({message: "triggered"})
   } catch (err) {
@@ -23,7 +23,7 @@ router.post('/trigger', async (req, res) => {
 
 router.post('/typing', async (req, res) => {
   let {channel, user, typing} = req.body
-  // console.log(req.body)
+  console.log(req.body)
   try {
     await pusher.trigger(channel, "typing", {
       user: user,
@@ -35,5 +35,6 @@ router.post('/typing', async (req, res) => {
   }
 
 })
+
 
 module.exports = router

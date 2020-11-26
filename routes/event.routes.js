@@ -194,8 +194,8 @@ router.put('/:eventid/dateblock', async (req, res) => {
       console.log("readyUserIndex: ", readyUserIndex)
       if (readyUserIndex > -1){
         event.readyUsers.splice(readyUserIndex,1)
-        event.status = "Pending"
       }
+      event.status = "Pending"
 
     if (index > -1) {
       let dateIndex = event.dateblocks[index].blockeddates.findIndex(date => date.toString() === (new Date(req.body.date)).toString())
