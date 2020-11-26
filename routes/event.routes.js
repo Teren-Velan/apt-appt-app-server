@@ -188,13 +188,13 @@ router.put("/dateblock/:eventid", async(req,res)=>{
 
 router.put('/:eventid/dateblock', async (req, res) => {
   try {
-    if(event.host[0] != req.user.username){
-      if(event.confirmedDate != null){
-        res.status(200).json({msg: "you are not the host"})
-      }
-    }
     let event = await Event.findOne({_id: req.params.eventid})
     let index = event.dateblocks.findIndex(dateblock => dateblock.participant === req.user.username)
+    if(event.host[0] != req.user.username){
+      if(event.confirmedDate != null){
+        return res.status(200).json({msg: "you are not the host"})
+      }
+    }
     let readyUserIndex = event.readyUsers.indexOf(req.user.username)
       if (readyUserIndex > -1){
         event.readyUsers.splice(readyUserIndex,1)
