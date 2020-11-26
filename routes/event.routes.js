@@ -303,8 +303,26 @@ router.put("/:eventid/modifydates" , async(req,res)=>{
     try{
         let event = await Event.findOne({_id : req.params.eventid})
         let {start_date, end_date} = req.body
-        event.start_date = start_date
-        event.end_date = end_date
+        if(start_date){
+          event.start_date = start_date
+        }else{
+          if(event.start_date){
+            start_date = event.start_date
+          }
+          else{
+            start_date = Date(Date.now())
+          }
+        }
+        if(end_date){
+          event.end_date = end_date
+        }else{
+          if(event.end_date){
+          end_date = event.end_date
+          }
+          else{
+            return res.status(200).json({msg: "You need an end date at least"})
+          }
+        }
         let end = new Date(end_date)
         let enddate = end.setDate(end.getDate(end)+1)
         let availableDates = []
