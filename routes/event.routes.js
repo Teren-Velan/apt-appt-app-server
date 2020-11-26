@@ -395,10 +395,18 @@ router.put("/:eventid/confirm",async(req,res)=>{
     let event = await Event.findOne({_id: req.params.eventid})
     let {date} = req.body
     if(req.user.username == event.host[0]){
+
     if(event.readyUsers.length != event.participants.length){
       return res.status(200).json({msg: "Not all participants are ready"})
     }
+    if(event.confirmedDate == null) {
+        event.confirmedDate = date
+        event.status = "Confirmed"
+        await event.save()
+        return res.status(200).json({msg: "Event updated"})
+    }
     else{
+
       if(event.confirmedDate == null){
         event.confirmedDate = date
         event.status = "Confirmed"
@@ -415,6 +423,7 @@ router.put("/:eventid/confirm",async(req,res)=>{
         event.status = "Confirmed"
         await event.save()
         return res.status(200).json({msg: "Event updated"})
+
     }
   }
   }catch(error){
