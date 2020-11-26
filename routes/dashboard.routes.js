@@ -66,7 +66,9 @@ router.get("/event", async(req,res)=>{
         let user = await User.findOne({username : req.user.username}).populate({
             path: "events",
         }).select(["events"])
+
         console.log("user populate ", user)
+
         return res.status(200).json({msg:"Populate event" , user})
     }
     catch(error){

@@ -24,8 +24,7 @@ const userSchema = new Schema({
     friendlist:[{
         type: mongoose.Schema.Types.ObjectId,
         ref: "User"
-    }]
-
+    }],
 })
 
 
