@@ -123,6 +123,9 @@ router.post("/addfriend",async(req,res)=>{
  */
 router.delete("/:eventid/delete", async(req,res)=>{
     let event = await Event.findOne({_id : req.params.eventid})
+    if(req.user.username != event.host[0]){
+        return res.status(200).json({msg: "You are not the host"})
+    }
     event.participants.forEach(async (el)=>{
         try{
             let user = await User.findOne({username: el})

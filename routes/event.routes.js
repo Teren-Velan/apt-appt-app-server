@@ -376,6 +376,7 @@ router.put("/:eventid/confirm",async(req,res)=>{
   try{
     let event = await Event.findOne({_id: req.params.eventid})
     let {date} = req.body
+    if(req.user.username == event.host[0]){
 
     if(event.readyUsers.length != event.participants.length){
       return res.status(200).json({msg: "Not all participants are ready"})
@@ -406,6 +407,7 @@ router.put("/:eventid/confirm",async(req,res)=>{
         return res.status(200).json({msg: "Event updated"})
 
     }
+  }
   }catch(error){
     res.status(400).json({error: error})
     console.log(error)
