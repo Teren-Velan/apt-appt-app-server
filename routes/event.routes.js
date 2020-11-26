@@ -188,14 +188,19 @@ router.put("/dateblock/:eventid", async(req,res)=>{
 
 router.put('/:eventid/dateblock', async (req, res) => {
   try {
+    if(event.host[0] != req.user.username){
+      if(event.confirmedDate != null){
+        res.status(200).json({msg: "you are not the host"})
+      }
+    }
     let event = await Event.findOne({_id: req.params.eventid})
     let index = event.dateblocks.findIndex(dateblock => dateblock.participant === req.user.username)
     let readyUserIndex = event.readyUsers.indexOf(req.user.username)
-      console.log("readyUserIndex: ", readyUserIndex)
       if (readyUserIndex > -1){
         event.readyUsers.splice(readyUserIndex,1)
       }
       event.status = "Pending"
+      event.confirmedDate = ""
 
     if (index > -1) {
       let dateIndex = event.dateblocks[index].blockeddates.findIndex(date => date.toString() === (new Date(req.body.date)).toString())
@@ -234,6 +239,9 @@ router.post("/:eventid/participant/add",async(req,res)=>{
    let {participant} = req.body
    let event = await Event.findOne({_id: req.params.eventid})
    let user = await User.findOne({username: participant})
+   if(event.host[0] != req.user.username){
+    return res.status(200).json({msg: "you are not the host"})
+  } 
    //Frontend to send an object participant
    let index = event.participants.indexOf(participant)
      if(index != -1){
@@ -247,7 +255,8 @@ router.post("/:eventid/participant/add",async(req,res)=>{
       }
       event.dateblocks.push(dateblocks)
       event.participants.push(participant)
-      
+      event.status = "Pending"
+      event.confirmedDate = ""
       user.events.push(event)
       await user.save()
       await event.save()
@@ -270,7 +279,7 @@ router.put("/:eventid/participant/delete", async(req,res)=>{
         if(req.user.username == event.host[0]){
         let {participant} = req.body
         if(participant == req.user.username){
-          return res.status(200).json({msg:"You can remove yourself"})
+          return res.status(200).json({msg:"You cant remove yourself"})
         }
         console.log(participant)
         event.participants.forEach(async (el,index)=>{
@@ -375,6 +384,11 @@ router.put("/:eventid/ready",async(req,res)=>{
   try{
     let event = await Event.findOne({_id : req.params.eventid})
     let index = event.readyUsers.indexOf(req.user.username)
+    if(event.host[0] != req.user.username){
+      if(event.confirmedDate != null){
+        return res.status(200).json({msg: "you are not the host"})
+      }
+    }
     if(index == -1){
       event.readyUsers.push(req.user.username)
       if(event.readyUsers.length == event.participants.length){
@@ -387,6 +401,7 @@ router.put("/:eventid/ready",async(req,res)=>{
     }
     else{
       event.readyUsers.splice(index,1)
+      event.status = "Pending"
       await event.save()
       return res.status(200).json({msg: "I'm UnReady!"})
     }
