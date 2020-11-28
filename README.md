@@ -1,4 +1,4 @@
-# Apt Appoint App
+# Apt Appointment App
 
 ### Overview
 The Apt Appointment App is a web-app designed to facilitate the planning of appointments with
